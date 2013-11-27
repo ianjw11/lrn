@@ -1,0 +1,507 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="https://156.154.17.82/sipix_si_lnp/services/LNPDownload?wsdl" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:lnpws="https://156.154.17.82/sipix_si_lnp/services/LNPDownload?wsdl" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:lnp="https://156.154.17.82/sipix_si_lnp/services/LNPDownload?xsd" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+
+   <wsdl:import namespace="http://www.neustar.biz/lnp/download" location="https://156.154.17.82/sipix_si_lnp/services/LNPDownload?xsd">
+   </wsdl:import> 
+   <wsdl:import namespace="https://156.154.17.82/sipix_si_lnp/services/LNPDownload?xsd">
+    </wsdl:import> 
+
+<wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:lnp="https://156.154.17.82/sipix_si_lnp/services/LNPDownload?xsd"
+           targetNamespace="https://156.154.17.82/sipix_si_lnp/services/LNPDownload?xsd"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="1.0.0">
+  <xs:annotation>
+    <xs:documentation>
+      XML schema for LNP download interface, version 1.0.0
+    </xs:documentation>
+  </xs:annotation>
+
+<!--
+      Top Elements
+  -->
+
+  <xs:element name="LNPDownloadRequest"   type="lnp:DownloadRequestType"  />
+  <xs:element name="LNPDownloadResponse"  type="lnp:DownloadResponseType" />
+
+<!--
+      Download Request Type
+  -->
+
+  <xs:complexType name="DownloadRequestType">
+    <xs:sequence>
+      <xs:element     name="Context"            type="xs:string"       />
+     
+        <xs:element   name="LastTransactionID"  type="xs:unsignedLong" />
+      
+      <xs:element     name="MaxNumberOfRecords" type="xs:unsignedInt"  />
+    </xs:sequence>
+  </xs:complexType>
+
+<!--
+      Download Response Type
+  -->
+
+  <xs:complexType name="DownloadResponseType">
+    <xs:sequence>
+      <xs:element name="ResponseCode"        type="lnp:ResponseCodeType" />
+      <xs:element name="ResponseText"        type="xs:string"            />
+      <xs:element name="ResponseMessage"     type="xs:string"
+         minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="ResponseTimestamp"   type="xs:dateTime"          />
+      <xs:choice minOccurs="0">
+        <xs:element     name="LastTransactionID"  type="xs:unsignedLong" />
+        <xs:sequence>
+          <xs:element   name="StartTime"          type="xs:dateTime"     />
+          <xs:element   name="StopTime"           type="xs:dateTime"     />
+        </xs:sequence>
+      </xs:choice>
+      <xs:element name="NextTransactionID"   type="xs:unsignedLong"
+         minOccurs="0" />
+      <xs:element name="LNPData"             type="lnp:LNPDataType"
+         minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+<!--
+      Download Response Type
+  -->
+
+  <xs:simpleType name="ResponseCodeType">
+    <xs:restriction base="xs:unsignedShort">
+      <xs:enumeration value="200"/>
+      <xs:enumeration value="201"/>
+      <xs:enumeration value="202"/>
+      <xs:enumeration value="400"/>
+      <xs:enumeration value="401"/>
+      <xs:enumeration value="403"/>
+      <xs:enumeration value="404"/>
+      <xs:enumeration value="420"/>
+      <xs:enumeration value="421"/>
+      <xs:enumeration value="500"/>
+      <xs:enumeration value="501"/>
+      <xs:enumeration value="503"/>
+      <xs:enumeration value="505"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+<!--
+      LNP Data Type
+  -->
+
+  <xs:complexType name="LNPDataType">
+    <xs:sequence>
+      <xs:element name="TransactionID"        type="xs:unsignedLong" />
+      <xs:element name="TransactionTimestamp" type="xs:dateTime"     />
+      <xs:element name="RegionID"             type="xs:unsignedInt"  />
+      <xs:choice>
+        <xs:element name="CreateSPID" type="lnp:SPIDDataType"   />
+        <xs:element name="UpdateSPID" type="lnp:SPIDDataType"   />
+        <xs:element name="DeleteSPID" type="lnp:SPIDDeleteType" />
+
+        <xs:element name="CreateLRN" type="lnp:LRNDataType"   />
+        <xs:element name="UpdateLRN" type="lnp:LRNDataType"   />
+        <xs:element name="DeleteLRN" type="lnp:LRNDeleteType" />
+
+        <xs:element name="CreateNPANXX" type="lnp:NPANXXDataType"   />
+        <xs:element name="UpdateNPANXX" type="lnp:NPANXXDataType"   />
+        <xs:element name="DeleteNPANXX" type="lnp:NPANXXDeleteType" />
+
+        <xs:element name="CreateNPANXXX" type="lnp:NPANXXXDataType"   />
+        <xs:element name="UpdateNPANXXX" type="lnp:NPANXXXDataType"   />
+        <xs:element name="DeleteNPANXXX" type="lnp:NPANXXXDeleteType" />
+
+        <xs:element name="CreateBlock" type="lnp:BlockDataType"   />
+        <xs:element name="UpdateBlock" type="lnp:BlockDataType"   />
+        <xs:element name="DeleteBlock" type="lnp:BlockDeleteType" />
+
+        <xs:element name="CreateSV" type="lnp:SVDataType"   />
+        <xs:element name="UpdateSV" type="lnp:SVDataType"   />
+        <xs:element name="DeleteSV" type="lnp:SVDeleteType" />
+
+        <xs:element name="CreateNPASplit" type="lnp:NPASplitDataType"   />
+        <xs:element name="UpdateNPASplit" type="lnp:NPASplitDataType"   />
+        <xs:element name="DeleteNPASplit" type="lnp:NPASplitDeleteType" />
+
+        <xs:element name="CreateNPANXXSplit" type="lnp:NPANXXSplitDataType" />
+        <xs:element name="DeleteNPANXXSplit" type="lnp:NPANXXSplitDataType" />
+
+        <xs:element name="MigrateSPIDSV"    type="lnp:MigrateSPIDDataType" />
+        <xs:element name="MigrateSPIDBlock" type="lnp:MigrateSPIDDataType" />
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+<!--
+      SPID Related Types
+  -->
+
+  <xs:complexType name="SPIDDataType">
+    <xs:sequence>
+      <xs:element name="SPID" type="lnp:SPIDType"       />
+      <xs:element name="Name" type="lnp:SPNameType"     />
+      <xs:element name="Type" type="lnp:SPType"         />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="SPIDType">
+    <xs:restriction base="xs:string">
+      <xs:length value="4" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="SPNameType">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="40" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="SPType">
+    <xs:restriction base="xs:integer" />
+  </xs:simpleType>
+
+  <xs:complexType name="SPIDDeleteType">
+    <xs:sequence>
+      <xs:element name="SPID" type="lnp:SPIDType"       />
+    </xs:sequence>
+  </xs:complexType>
+
+<!--
+      LRN Related Types
+  -->
+
+  <xs:complexType name="LRNDataType">
+    <xs:sequence>
+      <xs:element name="SPID"              type="lnp:SPIDType"   />
+      <xs:element name="ID"                type="lnp:LNPKeyType" />
+      <xs:element name="LRN"               type="lnp:LRNType"    />
+      <xs:element name="CreationTimestamp" type="xs:dateTime"    />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="LRNType">
+    <xs:restriction base="xs:hexBinary">
+      <xs:length value="5" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="LNPKeyType">
+    <xs:restriction base="xs:integer" />
+  </xs:simpleType>
+
+  <xs:complexType name="LRNDeleteType">
+    <xs:sequence>
+      <xs:element name="SPID"              type="lnp:SPIDType"   />
+      <xs:element name="ID"                type="lnp:LNPKeyType" />
+      <xs:element name="LRN"               type="lnp:LRNType"    />
+    </xs:sequence>
+  </xs:complexType>
+
+<!--
+      NPA-NXX Related Types
+  -->
+
+  <xs:complexType name="NPANXXDataType">
+    <xs:sequence>
+      <xs:element name="SPID"               type="lnp:SPIDType"   />
+      <xs:element name="ID"                 type="lnp:LNPKeyType" />
+      <xs:element name="NPA"                type="lnp:NPAType"    />
+      <xs:element name="NXX"                type="lnp:NXXType"    />
+      <xs:element name="EffectiveTimestamp" type="xs:dateTime"    />
+      <xs:element name="CreationTimestamp"  type="xs:dateTime"    />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="NumberStringType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[0123456789]{0,}" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="NPAType">
+    <xs:restriction base="lnp:NumberStringType">
+      <xs:length value="3" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="NXXType">
+    <xs:restriction base="lnp:NumberStringType">
+      <xs:length value="3" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="NPANXXDeleteType">
+    <xs:sequence>
+      <xs:element name="SPID"               type="lnp:SPIDType"   />
+      <xs:element name="ID"                 type="lnp:LNPKeyType" />
+      <xs:element name="NPA"                type="lnp:NPAType"    />
+      <xs:element name="NXX"                type="lnp:NXXType"    />
+    </xs:sequence>
+  </xs:complexType>
+
+<!--
+      NPA-NXX-X Related Types
+  -->
+
+  <xs:complexType name="NPANXXXDataType">
+    <xs:sequence>
+      <xs:element name="SPID"               type="lnp:SPIDType"    />
+      <xs:element name="ID"                 type="lnp:LNPKeyType"  />
+      <xs:element name="NPANXXX"            type="lnp:NPANXXXType" />
+      <xs:element name="EffectiveTimestamp" type="xs:dateTime"     />
+      <xs:element name="CreationTimestamp"  type="xs:dateTime"     />
+      <xs:element name="ModifiedTimestamp"  type="xs:dateTime"     />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="NPANXXXType">
+    <xs:restriction base="lnp:NumberStringType">
+      <xs:length value="7" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="NPANXXXDeleteType">
+    <xs:sequence>
+      <xs:element name="SPID"               type="lnp:SPIDType"    />
+      <xs:element name="ID"                 type="lnp:LNPKeyType"  />
+      <xs:element name="NPANXXX"            type="lnp:NPANXXXType" />
+    </xs:sequence>
+  </xs:complexType>
+
+<!--
+      Block Related Types
+  -->
+
+  <xs:complexType name="BlockDataType">
+    <xs:sequence>
+      <xs:element name="SPID"                type="lnp:SPIDType"   />
+      <xs:element name="ID"                  type="lnp:LNPKeyType" />
+      <xs:element name="NPANXXX"             type="lnp:NPANXXXType"/>
+      <xs:element name="LRN"                 type="lnp:LRNType"    />
+      <xs:element name="SVType"              type="lnp:SVType"     />
+      <xs:element name="ActivationTimestamp" type="xs:dateTime"    />
+      <xs:element name="CLASS"               type="lnp:DPCSSNType"
+        minOccurs="0" />
+      <xs:element name="LIDB"                type="lnp:DPCSSNType"
+        minOccurs="0" />
+      <xs:element name="ISVM"                type="lnp:DPCSSNType"
+        minOccurs="0" />
+      <xs:element name="CNAM"                type="lnp:DPCSSNType"
+        minOccurs="0" />
+      <xs:element name="WSMSC"               type="lnp:DPCSSNType"
+        minOccurs="0" />
+      <xs:element name="OptionalData"        type="lnp:OptionalDataType"
+        minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="SVType">
+    <xs:restriction base="xs:integer" />
+  </xs:simpleType>
+
+  <xs:complexType name="DPCSSNType">
+    <xs:sequence>
+      <xs:element name="DPC"                 type="lnp:DPCType"  />
+      <xs:element name="SSN"                 type="lnp:SSNType"  />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="DPCType">
+    <xs:restriction base="xs:hexBinary">
+      <xs:length value="3" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="SSNType">
+    <xs:restriction base="xs:unsignedByte" />
+  </xs:simpleType>
+
+  <xs:simpleType name="URIType">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"   />
+      <xs:maxLength value="255" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="EULVType">
+    <xs:restriction base="lnp:NumberStringType">
+      <xs:minLength value="1"  />
+      <xs:maxLength value="12" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="EULTType">
+    <xs:restriction base="lnp:NumberStringType">
+      <xs:length value="2" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="BillingIDType">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="4" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="OptionalDataType">
+    <xs:all>
+      <xs:element name="ALTSPID"  type="lnp:SPIDType"      minOccurs="0" />
+      <xs:element name="ALTEULV"  type="lnp:EULVType"      minOccurs="0" />
+      <xs:element name="ALTEULT"  type="lnp:EULTType"      minOccurs="0" />
+      <xs:element name="ALTBID"   type="lnp:BillingIDType" minOccurs="0" />
+      <xs:element name="VOICEURI" type="lnp:URIType"       minOccurs="0" />
+      <xs:element name="MMSURI"   type="lnp:URIType"       minOccurs="0" />
+      <xs:element name="POCURI"   type="lnp:URIType"       minOccurs="0" />
+      <xs:element name="PRESURI"  type="lnp:URIType"       minOccurs="0" />
+      <xs:element name="SMSURI"   type="lnp:URIType"       minOccurs="0" />
+      <xs:element name="LASTALTSPID"  type="lnp:SPIDType"      minOccurs="0" />
+      <xs:element name="SPCUSTOM1"  type="xs:string"      minOccurs="0" />
+      <xs:element name="SPCUSTOM2"  type="xs:string"      minOccurs="0" />
+      <xs:element name="SPCUSTOM3"  type="xs:string"      minOccurs="0" />
+    </xs:all>
+  </xs:complexType>
+
+  <xs:complexType name="BlockDeleteType">
+    <xs:sequence>
+      <xs:element name="ID"                  type="lnp:LNPKeyType" />
+      <xs:element name="NPANXXX"             type="lnp:NPANXXXType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+<!--
+      SV Related Types
+  -->
+
+  <xs:complexType name="SVDataType">
+    <xs:sequence>
+      <xs:element name="SPID"                type="lnp:SPIDType"    />
+      <xs:element name="ID"                  type="lnp:LNPKeyType"  />
+      <xs:element name="TN"                  type="lnp:TNType"      />
+      <xs:element name="LRN"                 type="lnp:LRNType"     />
+      <xs:element name="SVType"              type="lnp:SVType"      />
+      <xs:element name="LNPType"             type="lnp:LNPType"     />
+      <xs:element name="ActivationTimestamp" type="xs:dateTime"     />
+      <xs:element name="CLASS"               type="lnp:DPCSSNType"
+        minOccurs="0" />
+      <xs:element name="LIDB"                type="lnp:DPCSSNType"
+        minOccurs="0" />
+      <xs:element name="ISVM"                type="lnp:DPCSSNType"
+        minOccurs="0" />
+      <xs:element name="CNAM"                type="lnp:DPCSSNType"
+        minOccurs="0" />
+      <xs:element name="WSMSC"               type="lnp:DPCSSNType"
+        minOccurs="0" />
+      <xs:element name="EULV"                type="lnp:EULVType"
+        minOccurs="0" />
+      <xs:element name="EULT"                type="lnp:EULTType"
+        minOccurs="0" />
+      <xs:element name="BillingID"           type="lnp:BillingIDType"
+        minOccurs="0" />
+      <xs:element name="OptionalData"        type="lnp:OptionalDataType"
+        minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="TNType">
+    <xs:restriction base="lnp:NumberStringType">
+      <xs:length value="10" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="LNPType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="lspp" />
+      <xs:enumeration value="lisp" />
+      <xs:enumeration value="pool" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="SVDeleteType">
+    <xs:sequence>
+      <xs:element name="ID"                  type="lnp:LNPKeyType"  />
+      <xs:element name="TN"                  type="lnp:TNType"      />
+    </xs:sequence>
+  </xs:complexType>
+
+<!--
+      NPA Split Related Types
+  -->
+
+  <xs:complexType name="NPASplitDataType">
+    <xs:sequence>
+      <xs:element name="OldNPA"              type="lnp:NPAType"     />
+      <xs:element name="NewNPA"              type="lnp:NPAType"     />
+      <xs:element name="StartPDP"            type="xs:dateTime"     />
+      <xs:element name="EndPDP"              type="xs:dateTime"     />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="NPASplitDeleteType">
+    <xs:sequence>
+      <xs:element name="OldNPA"              type="lnp:NPAType"     />
+      <xs:element name="NewNPA"              type="lnp:NPAType"     />
+    </xs:sequence>
+  </xs:complexType>
+
+<!--
+      NPA-NXX Split Related Types
+  -->
+  <xs:complexType name="NPANXXSplitDataType">
+    <xs:sequence>
+      <xs:element name="OldNPA"              type="lnp:NPAType"    />
+      <xs:element name="NewNPA"              type="lnp:NPAType"    />
+      <xs:element name="NXX"                 type="lnp:NXXType"    />
+    </xs:sequence>
+  </xs:complexType>
+
+<!--
+      SPID Migration Related Types
+  -->
+
+  <xs:complexType name="MigrateSPIDDataType">
+    <xs:sequence>
+      <xs:element name="FromSPID"            type="lnp:SPIDType"    />
+      <xs:element name="ToSPID"              type="lnp:SPIDType"    />
+      <xs:element name="LRN"                 type="lnp:LRNType"     />
+    </xs:sequence>
+  </xs:complexType>
+
+	</xs:schema>
+</wsdl:types>
+  
+  <wsdl:message name="LNPDownloadRequest">
+    <wsdl:part name="LNPDownloadRequest" element="lnp:LNPDownloadRequest">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="LNPDownloadResponse">
+    <wsdl:part name="LNPDownloadResponse" element="lnp:LNPDownloadResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="LNPDownload">
+    <wsdl:operation name="LNPDownload">
+      <wsdl:input message="lnpws:LNPDownloadRequest">
+    </wsdl:input>
+      <wsdl:output message="lnpws:LNPDownloadResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="LNPDownloadSOAPBinding" type="lnpws:LNPDownload">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="LNPDownload">
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="LNPDownload">
+    <wsdl:port name="LNPDownload" binding="lnpws:LNPDownloadSOAPBinding">
+      
+       <soap:address location="https://sipix12-lnp.neustar.biz/sipix_si_lnp/services/LNPDownload"/>  
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
