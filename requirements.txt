@@ -1,0 +1,8 @@
+mysqldbda
+redis
+redisco
+django==1.5
+django-celery
+celery[redis]
+south
+mongoengine
