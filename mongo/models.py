@@ -1,4 +1,5 @@
 from mongoengine import *
+from mongoengine import fields
 
 connect("LNP_new",host="localhost")
 
