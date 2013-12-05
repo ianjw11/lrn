@@ -4,7 +4,7 @@ import csv
 from django.core.management.base import BaseCommand, CommandError
 import multiprocessing
 from multiprocessing import Process, Value, Lock
-import math,datetime.datetime
+import math,datetime
 
 
 class Command(BaseCommand):
@@ -44,7 +44,7 @@ class Readers(object):
     count=0
     for record in reader:
       
-      ts = datetime(record["ActivationTS"][:4],record["ActivationTS"][4:6],record["ActivationTS"][6:8])#create date obj with format year,month,day
+      ts = datetime.datetime(record["ActivationTS"][:4],record["ActivationTS"][4:6],record["ActivationTS"][6:8])#create date obj with format year,month,day
       t = Tn(TN=record["TN"],LRN=record["LRN"],SVType=record["SVType"],
          SPID=record["SPID"],LNPType=record["LNPType"],ActivationTS=ts)
       if len(batch) <= 5000:
