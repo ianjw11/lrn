@@ -39,7 +39,7 @@ class Readers(object):
     #self.bddreaders = [csv.DictReader(f, fieldnames=self.BddFields,delimiter="|") for f in self.f.blockhandles]
     
     
-  def parsesv(self,reader,thread):
+  def parsesv(self,reader,counter,thread):
     batch=[]
     count=0
     for record in reader:
@@ -47,9 +47,10 @@ class Readers(object):
       ts = datetime.datetime(int(record["ActivationTS"][:4]),int(record["ActivationTS"][4:6]),int(record["ActivationTS"][6:8]))
       
       #ensure primary keys dont collide on bulk insert
-      ID = int(str(thread+1) + str(record["ID"]))
+      ID = int(counter.val) + 1 + int(thread)
       t = Tn(ID=ID,TN=record["TN"],LRN=record["LRN"],SVType=record["SVType"],
          SPID=record["SPID"],LNPType=record["LNPType"],ActivationTS=ts)
+      counter.increment()
       if len(batch) <= 5000:
         batch.append(t)
       else:
@@ -62,12 +63,24 @@ class Readers(object):
         
   def proccess(self,Type="sv"):
     self.procs = []
+    counter = Counter()
     for idx,reader in enumerate(self.svreaders):
-        p = multiprocessing.Process(target=self.parsesv,args=(reader,idx))
+        p = multiprocessing.Process(target=self.parsesv,args=(reader,counter,idx))
         self.procs.append(p)
         p.start()
     
     for p in self.procs:
         p.join()
+        
+class Counter(object):
+    def __init__(self):
+        self.val = Value('i',0)
+        self.lock = Lock()
+    def increment(self):
+        with self.lock:
+            self.val.value += 1
+    def value(self):
+        with self.lock:
+            return self.val.value
         
         
