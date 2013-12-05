@@ -47,7 +47,7 @@ class Readers(object):
       ts = datetime.datetime(int(record["ActivationTS"][:4]),int(record["ActivationTS"][4:6]),int(record["ActivationTS"][6:8]))
       
       #ensure primary keys dont collide on bulk insert
-      ID = int(counter.val) + 1 + int(thread)
+      ID = int(counter.value()) + 1 + int(thread)
       t = Tn(ID=ID,TN=record["TN"],LRN=record["LRN"],SVType=record["SVType"],
          SPID=record["SPID"],LNPType=record["LNPType"],ActivationTS=ts)
       counter.increment()
@@ -57,7 +57,7 @@ class Readers(object):
         Tn.objects.bulk_create(batch)
         batch = []
         count+=5000
-        print(str(count) + "\n")
+        print(str(counter.value()) + "\n")
         
         
         
