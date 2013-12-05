@@ -14,7 +14,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'LNP',                      # Or path to database file if using sqlite3.
+        'NAME': 'lnp_new',                      # Or path to database file if using sqlite3.
         'USER':'ian',
         'PASSWORD':'LNP-dev',
         
@@ -136,11 +136,10 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
-    'south',
     'apiclient',
     'mongo',
     'sqldb',
-    
+    'bdd'
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
