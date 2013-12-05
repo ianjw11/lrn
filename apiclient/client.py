@@ -1,17 +1,17 @@
 from suds.client import Client
 import logging
-from models import Tn
+from mongo.models import Tn,TxnId
 from mongoengine import connect
 connect("LNP_new",host="localhost")
 
 
-werk = "7:07pm nov 26th"
 
 class Wsdl(object):
     url = "https://156.154.17.82/sipix_si_lnp/services/LNPDownload"
     maxrecords=10000
     LAST_TXN=195114
     Context="test"
+    nosql = True
     fields = ["LRN","SVType","SPID","LNPType","ActivationTimestamp"]
  
     def __init__(self,**kwargs):
@@ -31,16 +31,26 @@ class Wsdl(object):
         for event in events:
             if 'DeleteSV' in event:
                 try:
-                    Tn.objects.get(TN=event.DeleteSV.TN).delete()
+                    if self.nosql:
+                        Tn.objects.get(TN=event.DeleteSV.TN).delete()
+                    else:
+                        pass
                 except:
                     print "\n number doesnt exist " + str(event.DeleteSV.TN)
             elif any(x in event for x in ['CreateSV','UpdateSV']):
                 if 'CreateSV' in event:
                     dataelem=event.CreateSV # contains the fields we want
-                    record, created = Tn.objects.get_or_create(TN=dataelem.TN)
+                    if self.nosql:
+                        record, created = Tn.objects.get_or_create(TN=dataelem.TN)
+                    else:
+                        pass
                 elif 'UpdateSV' in event:
                     dataelem=event.UpdateSV
-                    record,created = Tn.objects.get_or_create(TN=dataelem.TN)
+                    if self.nosql:
+                        
+                        record,created = Tn.objects.get_or_create(TN=dataelem.TN)
+                    else:
+                        pass
                 for field in self.fields: # loop through fields
                     try:
                         value = getattr(dataelem,field) # get field from event xml obj
