@@ -35,20 +35,20 @@ class Command(BaseCommand):
     
   def readers(self):
     "generates iteratable dictreaders for all file handles"
-    self.svreaders = [csv.DictReader(f, fieldnames=self.SvFields,delimiter="|") for f in self.svhandles] 
+    self.svreaders = [csv.reader(f,delimiter="|") for f in self.svhandles] 
     #self.bddreaders = [csv.DictReader(f, fieldnames=self.BddFields,delimiter="|") for f in self.f.blockhandles]
-    
-
-    
-    
   @transaction.commit_manually
   def parsesv(self,reader):
     count=0
-    for record in ReadCsv(reader):
+    for record in reader:
       #create date obj with format year,month,day
-      ts = datetime.datetime( int(record["ActivationTS"][:4]), int(record["ActivationTS"][4:6]), int(record["ActivationTS"][6:8]) )
-      t = Tn(TN=record["TN"],LRN=record["LRN"],SVType=record["SVType"],
-               SPID=record["SPID"],LNPType=record["LNPType"],ActivationTS=ts)
+      activationts = record[self.SvFields.index("ActivationTS")]
+      ts = datetime.datetime( int(activationts[:4]), int(activationts[4:6]), int(activationts[6:8]) )
+      t = Tn(TN=record[self.SvFields.index("TN")],
+             LRN=record[self.SvFields.index("LRN")],
+             SVType=record[self.SvFields.index("SVType")],
+             SPID=record[self.SvFields.index("SPID")],
+             LNPType=record[self.SvFields.index("LNPType")],ActivationTS=ts)
       t.save()
       del t
       del ts
@@ -67,6 +67,3 @@ class Command(BaseCommand):
     for p in self.procs:
         p.join()
         
-def ReadCsv(reader):
-  for record in reader:
-    yield record
