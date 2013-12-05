@@ -9,7 +9,8 @@ def gethandle(filepath):
 
 class files(object):
   "Generate lists of file objects, supporting reading gzipped files directly"
-  regions = ["ma","mw","ne","se","sw","wc","we"]
+  #regions = ["ma","mw","ne","se","sw","wc","we"]
+  regions = ["ma","mw"]
   path = "/opt/lrn/"
 
   def __init__(self,path=path):
