@@ -49,10 +49,15 @@ class Readers(object):
     for record in reader:
       #create date obj with format year,month,day
       ts = datetime.datetime( int(record["ActivationTS"][:4]), int(record["ActivationTS"][4:6]), int(record["ActivationTS"][6:8]) )
-      Tn(TN=record["TN"],LRN=record["LRN"],SVType=record["SVType"],
-               SPID=record["SPID"],LNPType=record["LNPType"],ActivationTS=ts).save()
+      t = Tn(TN=record["TN"],LRN=record["LRN"],SVType=record["SVType"],
+               SPID=record["SPID"],LNPType=record["LNPType"],ActivationTS=ts)
+      t.save()
+      del t
+      del ts
+      del record
       count+=1
       if count >= 150000:
+        count=0
         transaction.commit()
   def proccess(self,Type="sv"):
     self.procs = []
