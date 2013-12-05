@@ -6,7 +6,7 @@ connect("LNP_new",host="localhost")
 
 
 class Tn(models.Model):
-    #ID = models.IntegerField(primary_key=True)
+    ID = models.AutoField(primary_key=True)
     TN = models.BigIntegerField()
     LRN = models.BigIntegerField()
     SVType = models.IntegerField()

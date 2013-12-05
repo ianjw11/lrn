@@ -45,7 +45,7 @@ class Readers(object):
     for record in reader:
       #create date obj with format year,month,day
       ts = datetime.datetime(int(record["ActivationTS"][:4]),int(record["ActivationTS"][4:6]),int(record["ActivationTS"][6:8]))
-      t = Tn(TN=record["TN"],LRN=record["LRN"],SVType=record["SVType"],
+      t = Tn(ID=record["ID"],TN=record["TN"],LRN=record["LRN"],SVType=record["SVType"],
          SPID=record["SPID"],LNPType=record["LNPType"],ActivationTS=ts)
       if len(batch) <= 5000:
         batch.append(t)
