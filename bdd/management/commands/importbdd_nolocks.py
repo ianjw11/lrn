@@ -43,15 +43,15 @@ class Readers(object):
     count=0
     for record in reader:
       #create date obj with format year,month,day
-      ts = datetime.datetime(int(record["ActivationTS"][:4]),int(record["ActivationTS"][4:6]),int(record["ActivationTS"][6:8]))
+      ts = datetime.datetime( int(record["ActivationTS"][:4]), int(record["ActivationTS"][4:6]), int(record["ActivationTS"][6:8]) )
       Tn(TN=record["TN"],LRN=record["LRN"],SVType=record["SVType"],
                SPID=record["SPID"],LNPType=record["LNPType"],ActivationTS=ts).save()
       count+=1
-      if count >= 15000:
+      if count >= 150000:
         transaction.commit()
   def proccess(self,Type="sv"):
     self.procs = []
-    for reader in enumerate(self.svreaders):
+    for reader in self.svreaders:
         p = multiprocessing.Process(target=self.parsesv,args=(reader,))
         self.procs.append(p)
         p.start()
