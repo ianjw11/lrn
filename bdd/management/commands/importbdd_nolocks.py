@@ -25,6 +25,11 @@ class Readers(object):
        "WSMSC_SSN","SVType","ALTSPID","VOICEURI","MMSURI","POCURI"," PRESURI",
        "SMSURI","ALTEULV","ALTEULT","ALTBID","Last Alt SPID","SPCustom 1",
        "SPCustom 2","SPCustom 3"]
+  BddFields = ["ID","NPA_NXX_X","LRN","SPID","ActivationTS","CLASS_DPC","CLASS_SSN",
+       "LIDB_DPC","LIDB_SSN"," ISVM_DPC","ISVN_SSN","CNAM_DPC","CNAM_SSN",
+       "WSMSC_DPC","WSMSC_SSN","DownloadReason","SVTYPE","ALTSPID","VOICEURI",
+       "MMSURI"," POCURI","PRESURI","SMSURI","ALTEULV","ALTEULT","ALTBID","Last",
+       "Alt SPID","SPCustom 1","SPCustom 2","SPCustom 3"]
   
   def __init__(self):
     """ set up file handles and create csvreader objects"""
