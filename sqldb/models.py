@@ -8,8 +8,6 @@ connect("LNP_new",host="localhost")
 class Tn(models.Model):
     TN = models.IntegerField(primary_key=True)
     LRN = models.IntegerField()
-    
-    
     SVType = models.IntegerField()
     SPID=models.CharField(max_length=25)
     LNPType=models.CharField(max_length=25)
