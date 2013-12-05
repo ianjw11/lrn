@@ -56,7 +56,7 @@ class Readers(object):
       del ts
       del record
       count+=1
-      if count >= 150000:
+      if count >= 15000:
         count=0
         transaction.commit()
   def proccess(self,Type="sv"):
