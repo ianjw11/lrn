@@ -39,13 +39,16 @@ class Readers(object):
     #self.bddreaders = [csv.DictReader(f, fieldnames=self.BddFields,delimiter="|") for f in self.f.blockhandles]
     
     
-  def parsesv(self,reader):
+  def parsesv(self,reader,thread):
     batch=[]
     count=0
     for record in reader:
       #create date obj with format year,month,day
       ts = datetime.datetime(int(record["ActivationTS"][:4]),int(record["ActivationTS"][4:6]),int(record["ActivationTS"][6:8]))
-      t = Tn(ID=record["ID"],TN=record["TN"],LRN=record["LRN"],SVType=record["SVType"],
+      
+      #ensure primary keys dont collide on bulk insert
+      ID = int(str(thread+1) + str(record["ID"]))
+      t = Tn(ID=ID,TN=record["TN"],LRN=record["LRN"],SVType=record["SVType"],
          SPID=record["SPID"],LNPType=record["LNPType"],ActivationTS=ts)
       if len(batch) <= 5000:
         batch.append(t)
@@ -53,14 +56,14 @@ class Readers(object):
         Tn.objects.bulk_create(batch)
         batch = []
         count+=5000
-        print(count + "\n")
+        print(str(count) + "\n")
         
         
         
   def proccess(self,Type="sv"):
     self.procs = []
-    for reader in self.svreaders:
-        p = multiprocessing.Process(target=self.parsesv,args=(reader,))
+    for idx,reader in enumerate(self.svreaders):
+        p = multiprocessing.Process(target=self.parsesv,args=(reader,idx))
         self.procs.append(p)
         p.start()
     
