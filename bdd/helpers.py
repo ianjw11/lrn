@@ -20,16 +20,16 @@ class files(object):
       
   def sv(self):
     """ get list of filehandles for sv bdd files"""
-    self.svhandles = []
+    svhandles = []
     for filepath in self.files:
       if "sv_BDD_PSTN" in filepath:
-        self.svhandles.append(gethandle(filepath))
-    return self.svhandles
+        svhandles.append(gethandle(filepath))
+    return svhandles
   
   def block(self):
     """ get list of filehandles for block bdd files"""
-    self.blockhandles = []
+    blockhandles = []
     for filepath in self.files:
       if "block_BDD_PSTN" in filepath:
-        self.blockhandles.append(gethandle(filepath))
-    return self.blockhandles
+        blockhandles.append(gethandle(filepath))
+    return blockhandles
