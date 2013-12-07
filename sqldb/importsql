@@ -1,0 +1,8 @@
+mysql -e "load data local infile 'mwsv.bdd' into table SUBSCRIPTIONVERSION fields terminated by '|'
+enclosed by '' lines terminated by '\n'
+(@dummy,TN,LRN,SPID,ActivationTS,@dummy,@dummy,@dummy,
+@dummy,@dummy,@dummy,@dummy,@dummy,@dummy,
+@dummy,@dummy,LnpType,@dummy,@dummy,
+@dummy,SVTYPE,@dummy,@dummy,@dummy,@dummy,@dummy,
+@dummy,@dummy,@dummy,@dummy,@dummy,@dummy,
+@dummy,@dummy) set TXN_ID=195114; " -uian -pLNP-dev lnp_new
