@@ -7,7 +7,9 @@ from multiprocessing import Process, Value, Lock
 import math,datetime
 from django.db import transaction
 import subprocess
-
+import os
+import gzip
+from multiprocessing import Process
 
 class Command(BaseCommand):
   regions = ["ma","mw","ne","se","sw","wc","we"]
@@ -27,11 +29,16 @@ class Command(BaseCommand):
   def handle(self, *args, **options):
     args = 'sv or block'
     help = 'import sv or block data to sql'
+    self.procs=[]
     self.generatepaths()
     self.txnid=195114
     self.run()
-  
-  def generatespaths(self,path=path):
+  def startgz(self,svfile,region,pipefile):
+    print("starting zcat")
+    subprocess.call(["mkfifo",pipefile]) # makes pipe
+    self.svpipes[region] = subprocess.call('zcat ' + svfile + ' > ' + pipefile,shell=True)
+    
+  def generatepaths(self,path=path):
     self.svpipes = {}
     self.svfiles = {}
     self.blockfiles = {}
@@ -40,11 +47,16 @@ class Command(BaseCommand):
       svfile = next(x for x in filelist if "sv_BDD" in x)
       
       if svfile.split(".")[-1]=="gz": # if we have a gz file create pipes
-        print("creating zcat pipe ")
-        pipefile = svfile[:-1]
-        subprocess.call(["mkfifo",pipefile]) # makes pipe
-        pipehandle=open(pipefile,"wb")
-        self.svpipes[region] = subprocess.Popen(['zcat',svfile],stdout=pipehandle) # spawn proccess to zcat file to pipe
+        
+        pipefile = svfile[:-3] + ".pipe"
+        print("running mkfifo ")
+        
+        
+        p = multiprocessing.Process(target=self.startgz,args=(svfile,region,pipefile))
+        self.procs.append(p)
+        p.start()
+        #self.svpipes[region] = subprocess.Popen(['zcat',svfile],stdout=open(pipefile,"wb")) # spawn proccess to zcat file to pipe
+        #self.svpipes[region] = subprocess.Popen("zcat " + svfile + " > " + pipefile,shell=True)
         self.svfiles[region] = pipefile # set imported file to pipe
       else:
         self.svfiles[region] = svfile
@@ -61,18 +73,22 @@ class Command(BaseCommand):
  
   def run(self,table="sv"):
     self.queries = []
+    #try:
     if table == "sv":
       self.mksvfields()
       for region,filename in self.svfiles.iteritems():
         sqlcmd = self.generatesql(self.svfields,"SUBSCRIPTIONVERSION",filename,region)
-        self.queries.append(subprocess.Popen(sqlcmd,shell=True))
+        print "starting query " + sqlcmd
+        print subprocess.call(sqlcmd,shell=True)
         
-    return [p.wait() for p in self.queries]
+    #[p.wait() for p in self.queries]
+    #except:
+      #[p.kill for p in self.svpipes.values()]
   
   def generatesql(self,fields,table,filename,regionid):
     fieldstext = ",".join(fields)
     sql = """mysql -e "load data local infile '{filename}' into table {table} fields terminated by '|' enclosed by '' lines terminated by '\\n'
-    ({fields}) set TXN_ID={txnid},RegionId={regionid};" -u{user} -p{passwd} {db}
+    ({fields}) SET TXN_ID={txnid}, RegionId='{regionid}' ;" -u{user} -p{passwd} {db}
     
     """.format(filename=filename,table=table,
                fields=fieldstext,txnid=self.txnid,regionid=regionid,
