@@ -33,18 +33,28 @@ class Command(BaseCommand):
         for i in range(threads):
             min = chunksize * i
             max = chunksize * (i + 1)
-            qs = Tn.objects.filter(pk__gt=min,pk__lte=max).only("TN","LRN")
-            p = multiprocessing.Process(target=self.proc,args=(qs,min,i,))
+            #qs = Tn.objects.filter(pk__gt=min,pk__lte=max).only("TN","LRN")
+            #p = multiprocessing.Process(target=self.proc,args=(qs,min,i))
+            p = multiprocessing.Process(target=self.proc,args=(min,max,i))
             procs.append(p)
             p.start()
         for p in procs:
             p.join()
             
-    def proc(self,qs,minpk,i):
-        print(" \n thread # " + str(i) + " with min pk " + str(minpk))
+    #def proc(self,qs,minpk,i):
+    def proc(self,min,max,i):
+        print(" \n thread # " + str(i) + " with min pk " + str(min))
         r = redis.Redis("localhost")
-        QsIt(qs,minpk,r) # execute redis pipelines in chunks 
-            
+        qs = Tn.objects.filter(pk__gt=min,pk__lte=max).only("TN","LRN").order_by('pk')
+        #QsIt(qs,min,r) # execute redis pipelines in chunks 
+        pk = min
+        while pk < max:
+            p = r.pipeline(transaction=False)
+            for row in qs.filter(pk__gt=pk,pk__lte=max)[:50000]:
+                pk = row.pk
+                p.set(row.TN,row.LRN)
+                #yield row
+            p.execute()
         
         
         
