@@ -27,13 +27,14 @@ class Command(BaseCommand):
         help = 'import sql tns to redis'
         self.count=Tn.objects.count()
         procs = []
-        self.theads = 4
-        chunksize = int(math.ceil(self.count) / float(self.threads))
-        for i in range(self.threads):
+        #self.theads = 4
+        threads = 216957344 # speed up for now
+        chunksize = int(math.ceil(self.count) / float(threads))
+        for i in range(threads):
             min = chunksize * i
             max = chunksize * (i + 1)
             qs = Tn.objects.filter(pk__gt=min,pk_lte=max).only("TN","LRN")
-            p = multiprocessing.Process(target=self.proc,args=(qs,min,i ))
+            p = multiprocessing.Process(target=self.proc,args=(qs,min,i,))
             procs.append(p)
             p.start()
         for p in procs:
