@@ -7,7 +7,7 @@ import redis
 
 
 
-def QsIt(queryset,pk,r,chunksize=10000):
+def QsIt(queryset,pk,r,chunksize=100000):
     print("\n at pk # " + str(pk))
     p = r.pipeline(transaction=False)
     last_pk = queryset.order_by('-pk')[0].pk
@@ -25,10 +25,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         args = ''
         help = 'import sql tns to redis'
-        self.count=Tn.objects.count()
+        count=Tn.objects.count()
         procs = []
         threads=4
-        count = 216957344 # speed up for now
+        
         chunksize = int(math.ceil(count) / float(threads))
         for i in range(threads):
             min = chunksize * i
