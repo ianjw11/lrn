@@ -33,7 +33,7 @@ class Command(BaseCommand):
         for i in range(threads):
             min = chunksize * i
             max = chunksize * (i + 1)
-            qs = Tn.objects.filter(pk__gt=min,pk_lte=max).only("TN","LRN")
+            qs = Tn.objects.filter(pk__gt=min,pk__lte=max).only("TN","LRN")
             p = multiprocessing.Process(target=self.proc,args=(qs,min,i,))
             procs.append(p)
             p.start()
