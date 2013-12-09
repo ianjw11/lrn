@@ -8,7 +8,6 @@ import math,datetime
 from django.db import transaction
 import subprocess
 import os
-import gzip
 from multiprocessing import Process
 
 class Command(BaseCommand):

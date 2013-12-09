@@ -1,6 +1,6 @@
 import lrn.mongo # sets up mongoengine connection and imports for db
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
