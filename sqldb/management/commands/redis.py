@@ -21,12 +21,13 @@ def QsIt(queryset,pk,r,chunksize=10000):
 
 
 class Command(BaseCommand):
-    theads = 4
+    
     def handle(self, *args, **options):
         args = ''
         help = 'import sql tns to redis'
         self.count=Tn.objects.count()
         procs = []
+        self.theads = 4
         chunksize = int(math.ceil(self.count) / float(self.threads))
         for i in range(self.threads):
             min = chunksize * i
