@@ -41,7 +41,7 @@ class SipProxy(sip.Proxy):
         if at != -1: TN = To[start:at]
         else: TN = To[start:]
         """
-        TN = self.findtn(message.headers["to"][0]).group(1) # use regex to pull out number
+        TN = self.findtn.search(message.headers["to"][0]).group(1) # use regex to pull out number
         #print ("\n TN IS: " + str(TN))
         """ Yielding the redis results should allow the reactor to continue processing other 
         requests while waiting for response
