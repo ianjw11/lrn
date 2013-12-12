@@ -3,12 +3,11 @@ from twisted.internet import reactor
 from twisted.python import log
 from twisted.protocols import sip
 from twisted.internet.protocol import ServerFactory
+from twisted.application import internet, service
 from pprint import pprint
 import txredisapi as redis 
 from twisted.internet import defer
-
-
-myIP = '10.0.1.8'
+myIP = '199.19.120.51'
 # port to bind this redirect server to
 myport = 5060
 
@@ -37,7 +36,7 @@ class SipProxy(sip.Proxy):
         start = To.find("sip:") + 4 # position of to header to start parsing at
         if at != -1: TN = To[start:at]
         else: TN = To[start:]
-        print ("\n TN IS: " + str(TN))
+        #print ("\n TN IS: " + str(TN))
         if len(TN) == 11: LRN = yield self.pool.get(TN[1:])
         else: LRN = yield self.pool.get(TN)
         r = self.responseFromRequest(302, message)
@@ -51,6 +50,5 @@ class SipProxy(sip.Proxy):
 class sipfactory(ServerFactory):
     protocol = SipProxy
 
-
-reactor.listenUDP(myport, SipProxy(), myIP)
+reactor.listenUDP(myport, SipProxy())
 reactor.run()
