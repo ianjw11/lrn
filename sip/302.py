@@ -16,7 +16,7 @@ UserAgent = "amazingness"
 class SipProxy(sip.Proxy):
 
     def connect(self):
-        self.pool = redis.lazyConnectionPool(host="localhost",port=6379,reconnect=True)
+        self.pool = redis.lazyConnectionPool(host="localhost",port=6379,poolsize=100,reconnect=True)
         #print self.pool
         #l = yield self.pool.get("14124173907")
         #print l
@@ -37,7 +37,10 @@ class SipProxy(sip.Proxy):
         if at != -1: TN = To[start:at]
         else: TN = To[start:]
         #print ("\n TN IS: " + str(TN))
-        if len(TN) == 11: LRN = yield self.pool.get(TN[1:])
+        """ Yielding the redis results should allow the reactor to continue processing other 
+        requests while waiting for response
+        """
+        if len(TN) == 11: LRN = yield self.pool.get(TN[1:]) 
         else: LRN = yield self.pool.get(TN)
         r = self.responseFromRequest(302, message)
         r.addHeader("Contact", "<sip:" + str(TN) + ";rn=+1" + str(LRN) + ">")
