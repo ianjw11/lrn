@@ -10,8 +10,10 @@ from pprint import pprint
 import txredisapi as redis 
 from twisted.internet import defer
 import re
+import socket
+
 from socket import AF_INET
-myIP = '199.19.120.51'
+myIP = '127.0.0.1'
 # port to bind this redirect server to
 myport = 5060
 
@@ -62,6 +64,7 @@ class SipProxy(sip.Proxy):
 class sipfactory(ServerFactory):
     protocol = SipProxy
 
+"""
 def main(fd=None):
     factory = sipfactory
     if fd is None:
@@ -75,9 +78,27 @@ def main(fd=None):
     else:
         # Another process created the port, just start listening on it.                                                                            
         port = reactor.adoptStreamPort(fd, AF_INET, SipProxy())
-
     reactor.run()
+"""
 
+def main(fd=None):  
+    if fd is None: 
+        port = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # Make the port non-blocking and start it listening.
+        port.setblocking(False)
+        port.bind(('127.0.0.1', myport))
+        for i in range(3):
+            arglist = [executable, __file__, str(port.fileno())]
+            #arglist = [executable,str(port.fileno())]
+            reactor.spawnProcess(None, executable, arglist,
+                childFDs={0: 0, 1: 1, 2: 2, port.fileno(): port.fileno()},env=environ)
+        # Now pass the port file descriptor to the reactor
+        port = reactor.adoptDatagramPort(port.fileno(), socket.AF_INET, SipProxy())
+    else:
+        # Another process created the port, just start listening on it.                                                                            
+        port = reactor.adoptDatagramPort(fd, AF_INET, SipProxy())
+    reactor.run()
+    
 #reactor.listenUDP(myport, SipProxy())
 #reactor.run()
 if __name__ == '__main__':
