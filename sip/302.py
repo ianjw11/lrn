@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from os import environ
+from sys import argv, executable
 from twisted.internet import reactor
 from twisted.python import log
 from twisted.protocols import sip
@@ -8,6 +10,7 @@ from pprint import pprint
 import txredisapi as redis 
 from twisted.internet import defer
 import re
+from socket import AF_INET
 myIP = '199.19.120.51'
 # port to bind this redirect server to
 myport = 5060
@@ -59,5 +62,28 @@ class SipProxy(sip.Proxy):
 class sipfactory(ServerFactory):
     protocol = SipProxy
 
-reactor.listenUDP(myport, SipProxy())
-reactor.run()
+def main(fd=None):
+    factory = sipfactory
+    if fd is None:
+        # Create a new listening port and several other processes to help out.                                                                     
+        port = reactor.listenUDP(myport, SipProxy())
+        for i in range(3):
+            reactor.spawnProcess(
+                    None, executable, [executable, __file__, str(port.fileno())],
+                childFDs={0: 0, 1: 1, 2: 2, port.fileno(): port.fileno()},
+                env=environ)
+    else:
+        # Another process created the port, just start listening on it.                                                                            
+        port = reactor.adoptStreamPort(fd, AF_INET, SipProxy())
+
+    reactor.run()
+
+#reactor.listenUDP(myport, SipProxy())
+#reactor.run()
+if __name__ == '__main__':
+    if len(argv) == 1:
+        main()
+    else:
+        main(int(argv[1]))
+
+

@@ -7,3 +7,5 @@ celery[redis]
 south
 mongoengine
 MySQL-python
+txredisapi
+twisted
