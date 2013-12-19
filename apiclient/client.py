@@ -1,18 +1,19 @@
 from suds.client import Client
 import logging
-from sqldb.models import Tn, LastTxn
+from sqldb.models import Tn,Block,LastTxn
 from mongoengine import connect
 from django.db import transaction
+from django.db.models import Max
 connect("LNP_new",host="localhost")
 
 
 
 class Wsdl(object):
     url = "https://156.154.17.82/sipix_si_lnp/services/LNPDownload"
-    maxrecords=20000
-    LAST_TXN=195114
+    LAST_TXN=195114 # defaults for testing
+    
     Context="test"
-    nosql = True
+    maxrecords=20000
     fields = ["LRN","SVType","SPID","LNPType","ActivationTS"]
  
     def __init__(self,**kwargs):
@@ -20,9 +21,11 @@ class Wsdl(object):
         self.client = Client(self.url+"?wsdl",location=self.url)
         for k, v in kwargs.iteritems():  
             setattr(self, k, v) # set obj attributes to kwargs
-        txns = LastTxn.objects.all()
-        if len(txns) > 0:
-            self.LAST_TXN=txns[-1].NextTransactionID
+        try:
+            self.LAST_TXN = LastTxn.objects.all().aggregate(Max('LAST_TXN_ID'))['LAST_TXN_ID__max']
+        except:
+            print "error unable to get last transaction ID"
+            raise Exception('TXN_ID')
           
     @transaction.commit_manually
     def send(self):
@@ -30,6 +33,7 @@ class Wsdl(object):
             result = self.client.service.LNPDownload(Context=self.Context,# execute remote RPC call to pull down events
                                                      LastTransactionID=self.LAST_TXN,MaxNumberOfRecords=self.maxrecords) 
             if result.NextTransactionID == self.LAST_TXN:
+                print "No new transactions to process"
                 break
             # add on events to results list
             try:
@@ -49,7 +53,7 @@ class Wsdl(object):
         for event in events:
             if 'DeleteSV' in event:
                 try:
-                    Tn.objects.get(TN=event.DeleteSV.TN).delete()
+                    Tn.objects.filter(TN=event.DeleteSV.TN).delete()
                 except:
                     print "\n number doesnt exist " + str(event.DeleteSV.TN)
             elif any(x in event for x in ['CreateSV','UpdateSV']):
