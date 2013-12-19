@@ -14,7 +14,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'lnp_ian1',                      # Or path to database file if using sqlite3.
+        'NAME': 'lnp_ian',                      # Or path to database file if using sqlite3.
         'USER':'ian',
         'PASSWORD':'LNP-dev',
         'HOST':'localhost',

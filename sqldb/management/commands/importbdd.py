@@ -23,7 +23,7 @@ class Command(BaseCommand):
          "WSMSC_SSN","SVType","ALTSPID","VOICEURI","MMSURI","POCURI"," PRESURI",
          "SMSURI","ALTEULV","ALTEULT","ALTBID","Last Alt SPID","SPCustom 1",
          "SPCustom 2","SPCustom 3"]
-    BddFields = ["ID-ignore","NPA_NXX_X","LRN","SPID","ActivationTS","CLASS_DPC","CLASS_SSN",
+    BddFields = ["ID-ignore","NPANXXX","LRN","SPID","ActivationTS","CLASS_DPC","CLASS_SSN",
          "LIDB_DPC","LIDB_SSN"," ISVM_DPC","ISVN_SSN","CNAM_DPC","CNAM_SSN",
          "WSMSC_DPC","WSMSC_SSN","DownloadReason","SVType","ALTSPID","VOICEURI",
          "MMSURI"," POCURI","PRESURI","SMSURI","ALTEULV","ALTEULT","ALTBID","Last",
@@ -118,7 +118,6 @@ class Command(BaseCommand):
                     self.svfiles[region] = pipefile # set imported file to pipe
                 else:
                     self.svfiles[region] = svfile
-
             self.blockfiles[region] = next(x for x in filelist if "block_BDD" in x) 
 
     def mksvfields(self):
@@ -128,9 +127,7 @@ class Command(BaseCommand):
         names = [f.name for f in Block._meta.fields]
         self.blockfields = [field if field in names else "@dummy" for field in self.BddFields ] # generate list of fields for csv import
 
-
     def run(self):
-        
         self.queries = []
         if self.sv:
             time.sleep(3)
