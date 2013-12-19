@@ -27,11 +27,11 @@ class Tn(models.Model):
 class Block(models.Model):
     ID = models.AutoField(primary_key=True)
     NPANXXX = models.BigIntegerField(db_column="NPA_NXX_X")
-    LRN = models.BigIntegerField()
-    SVType = models.IntegerField()
+    LRN = models.BigIntegerField(null=True)
+    SVType = models.IntegerField(null=True)
     SPID=models.CharField(max_length=25)
     #LNPType=models.CharField(max_length=25)
-    ActivationTS = models.DateField()
+    ActivationTimestamp = models.DateField(db_column="ActivationTS")
     #ActivationTimestamp = models.DateTimeField(db_column="ActivationTS")
     TxnId = models.BigIntegerField(db_column="TXN_ID") # set default to TX id of BDD dumps
     RegionId = models.CharField(max_length=3,default="")

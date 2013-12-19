@@ -35,7 +35,7 @@ class Wsdl(object):
     Context="test"
     maxrecords=20000
     fields = ["LRN","SVType","SPID","LNPType","ActivationTS"]
-    blockfields = ["LRN","SVType","SPID","ActivationTS"]
+    blockfields = ["LRN","SVType","SPID","ActivationTimestamp"]
  
     def __init__(self,**kwargs):
         self.results=[]
@@ -80,46 +80,72 @@ class Wsdl(object):
                     Tn.objects.filter(TN=event.DeleteSV.TN).delete()
                 except:
                     print "\n number doesnt exist " + str(event.DeleteSV.TN)
+            
             elif any(x in event for x in ['CreateSV','UpdateSV']):
-                if 'CreateSV' in event:
-                    dataelem=event.CreateSV # contains the fields we want
-                    record, created = Tn.objects.get_or_create(TN=dataelem.TN)
-                elif 'UpdateSV' in event:
-                    dataelem=event.UpdateSV
-                    record,created = Tn.objects.get_or_create(TN=dataelem.TN)
-                record.TxnId=event.TransactionID # set record txnid to xml request txnid
-                for field in self.fields: # loop through fields
-                    try:
-                        value = getattr(dataelem,field) # get field from event xml obj
-                        setattr(record,field,value) # set  object to val
-                    except:
-                        print "\n failed for field " + str(field) + "\n"
-                        print(dataelem)
-                        print(record)
-                record.save()
+                try:
+                    if 'CreateSV' in event:
+                        dataelem=event.CreateSV # contains the fields we want
+                        record = Tn(TN=dataelem.TN)
+           
+                    elif 'UpdateSV' in event:
+                    
+                        dataelem=event.UpdateSV
+                        record,created = Tn.objects.get_or_create(TN=dataelem.TN)
+                    record.TxnId=event.TransactionID # set record txnid to xml request txnid
+                    for field in self.fields: # loop through fields
+                        try:
+                            value = getattr(dataelem,field) # get field from event xml obj
+                            if value:
+                                setattr(record,field,value) # set  object to val
+                        except:
+                            print "\n failed for field " + str(field) + "\n"
+                            print(dataelem)
+                            print(record)
+                    record.save()
+                except Exception, err:
+                    if 'CreateSV' in event:
+                        t="Create"
+                    elif 'UpdateSV' in event:
+                        t="Update"
+                    print Exception, err 
+                    print " for sv method " + t
+                    print(event)
+                    raise
           
             
             elif 'DeleteBlock' in event:
                 Block.objects.filter(NPANXXX=event.DeleteBlock.NPANXXX).delete()
                 
             elif any(x in event for x in ['UpdateBlock','CreateBlock']):
-                if 'CreateBlock' in event:
-                    dataelem=event.CreateBlock # contains the fields we want
-                    record, created = Block.objects.get_or_create(NPANXXX=dataelem.NPANXXX)
-                elif 'UpdateBlock' in event:
-                    dataelem=event.UpdateBlock
-                    record,created = Block.objects.get_or_create(NPANXXX=dataelem.NPANXXX)
-                record.TxnId=event.TransactionID # set record txnid to xml request txnid
-                for field in self.blockfields: # loop through fields
-                    try:
-                        value = getattr(dataelem,field) # get field from event xml obj
-                        setattr(record,field,value) # set  object to val
-                    except:
-                        print "\n failed for field " + str(field) + "\n"
-                        print(dataelem)
-                        print(record)
-                record.save()
-          
+                try:
+                    if 'CreateBlock' in event:
+                        dataelem=event.CreateBlock # contains the fields we want
+                        #record, created = Block.objects.get_or_create(NPANXXX=dataelem.NPANXXX)
+                        record = Block(NPANXXX=dataelem.NPANXXX)
+                    elif 'UpdateBlock' in event:
+                        dataelem=event.UpdateBlock
+                        record,created = Block.objects.get_or_create(NPANXXX=dataelem.NPANXXX)
+                    record.TxnId=event.TransactionID # set record txnid to xml request txnid
+                    for field in self.blockfields: # loop through fields
+                        try:
+                            value = getattr(dataelem,field) # get field from event xml obj
+                            if value:
+                                setattr(record,field,value) # set  object to val
+                        except:
+                            print "\n failed for field " + str(field) + "\n"
+                            print(dataelem)
+                            print(record)
+                    record.save()
+                except Exception, err:
+                    if 'CreateBlock' in event:
+                        t="Create"
+                    elif 'UpdateBlock' in event:
+                        t="Update"
+                    print Exception, err 
+                    print " for block method " + t
+                    print(event)
+                    raise
+              
 
 
 
