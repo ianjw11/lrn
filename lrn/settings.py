@@ -139,7 +139,7 @@ INSTALLED_APPS = (
     'apiclient',
     'mongo',
     'sqldb',
-    'bdd'
+    #'bdd'
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )

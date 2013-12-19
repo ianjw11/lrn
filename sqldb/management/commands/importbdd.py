@@ -1,4 +1,4 @@
-from bdd.helpers import *
+#from bdd.helpers import *
 from sqldb.models import Tn,Block,LastTxn
 import csv
 from django.core.management.base import BaseCommand, CommandError
@@ -9,11 +9,13 @@ from django.db import transaction
 import subprocess
 import os
 from multiprocessing import Process
+from optparse import make_option
 from pprint import pprint
 
 class Command(BaseCommand):
     regions = ["ma","mw","ne","se","sw","wc","we"]
     path = "/opt/lrn/"
+    db = "lnp_new"
     SvFields = ["ID-ignore","TN","LRN","SPID","ActivationTS","CLASS_DPC","CLASS_SSN","LIDB_DPC",
          "LIDB_SSN","ISVM_DPC","ISVM_SSN","CNAM_DPC","CNAM_SSN","EndUserLocation",
          "EndUserLocationType","BillingId","LNPType","DownloadReason","WSMSC_DPC",
@@ -25,14 +27,54 @@ class Command(BaseCommand):
          "WSMSC_DPC","WSMSC_SSN","DownloadReason","SVType","ALTSPID","VOICEURI",
          "MMSURI"," POCURI","PRESURI","SMSURI","ALTEULV","ALTEULT","ALTBID","Last",
          "Alt SPID","SPCustom 1","SPCustom 2","SPCustom 3"]
-    args = 'sv or block'
-    help = 'import sv or block data to sql'
+    args = 'specify "sv" to also import sv data'
+    help = 'import sv and block data into sql db. '
+    option_list = BaseCommand.option_list + (
+        make_option(
+            "-t", 
+            "--tnx_id", 
+            dest = "txnid",
+            help = "specify last transactionid", 
+            metavar = "TXN_ID"
+        ),
+        make_option(
+            "-d", 
+            "--database", 
+            dest = "db",
+            help = "specify last database name(optional)", 
+            metavar = "DB"
+        ),
+        make_option(
+            "-b", 
+            "--bdd", 
+            dest = "path",
+            help = "specify path to extracted bdd file tree(the directory with ma, mw, etc...", 
+            metavar = "/path/to/extracted/bdds"
+        ),
+    )
+
     def handle(self, *args, **options):
+        #check and parse all options first
+        if options['txnid'] == None :
+                raise CommandError("Option '--txn=...' is required.") # exit if no txn_id specified....we need this
+        self.txnid = options['txn_id']
+        
+        if options['db'] == None:
+            print """ no database specified, using {default}
+             note:  if not using default Database specified in settings.py({default}), you must create the table schema manually in sql
+             """.format(default=self.db)
+        else:
+            self.db=options['db']
+            
+        if options['path'] == None:
+            print "no path specified using default of " + self.path
+        else:
+            self.path=options['path']
+        
         self.procs=[]
         sv = False # flag to create handles for SV files if enabled SV files will have special pipes created so they can be read as GZ
         if "sv" in args:
             sv = True
-        self.txnid=195114
         self.run(sv) 
     def startgz(self,svfile,region,pipefile):
         print("starting zcat")
@@ -98,6 +140,6 @@ class Command(BaseCommand):
 
         """.format(filename=filename,table=table,
                    fields=fieldstext,txnid=self.txnid,regionid=regionid,
-                   user="ian",passwd="LNP-dev",db="lnp_new"
+                   user="ian",passwd="LNP-dev",db=self.db
                    )
         return sql
