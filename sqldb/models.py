@@ -35,14 +35,14 @@ class Block(models.Model):
     #SVType = models.PositiveSmallIntegerField(default=0,null=True)
     SVType = TinyIntField()
     SPID= FixedCharField(max_length=4)
-    ActivationTimestamp = models.DateField()#db_column="ActivationTS")
+    ActivationTimestamp = models.DateTimeField()#db_column="ActivationTS")
     TxnId = models.BigIntegerField(db_column="TXN_ID",db_index=True) # set default to TX id of BDD dumps
     RegionId = FixedCharField(max_length=2,default="")
     class Meta:
         db_table = 'NUMBERPOOLBLOCK'
 class LastTxn(models.Model):
     LAST_TXN_ID = models.BigIntegerField(primary_key=True)
-    TXN_TIMESTAMP = models.DateField(auto_now_add=True)
+    TXN_TIMESTAMP = models.DateTimeField(auto_now_add=True)
     class Meta:
         db_table = 'LAST_TXN'
     
