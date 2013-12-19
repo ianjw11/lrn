@@ -1,5 +1,5 @@
 from bdd.helpers import *
-from sqldb.models import Tn,Block
+from sqldb.models import Tn,Block,LastTxn
 import csv
 from django.core.management.base import BaseCommand, CommandError
 import multiprocessing
@@ -22,13 +22,12 @@ class Command(BaseCommand):
          "SPCustom 2","SPCustom 3"]
     BddFields = ["ID-ignore","NPA_NXX_X","LRN","SPID","ActivationTS","CLASS_DPC","CLASS_SSN",
          "LIDB_DPC","LIDB_SSN"," ISVM_DPC","ISVN_SSN","CNAM_DPC","CNAM_SSN",
-         "WSMSC_DPC","WSMSC_SSN","DownloadReason","SVTYPE","ALTSPID","VOICEURI",
+         "WSMSC_DPC","WSMSC_SSN","DownloadReason","SVType","ALTSPID","VOICEURI",
          "MMSURI"," POCURI","PRESURI","SMSURI","ALTEULV","ALTEULT","ALTBID","Last",
          "Alt SPID","SPCustom 1","SPCustom 2","SPCustom 3"]
     args = 'sv or block'
     help = 'import sv or block data to sql'
     def handle(self, *args, **options):
-        
         self.procs=[]
         sv = False # flag to create handles for SV files if enabled SV files will have special pipes created so they can be read as GZ
         if "sv" in args:
@@ -73,24 +72,24 @@ class Command(BaseCommand):
     def run(self,sv):
         self.generatepaths(sv)
         self.queries = []
-        #try:
         if sv:
             self.mksvfields()
             for region,filename in self.svfiles.iteritems():
-                sqlcmd = self.generatesql(self.svfields,"SUBSCRIPTIONVERSION",filename,region)
+                sqlcmd = self.generatesql(self.svfields,Tn._meta.db_table,filename,region)
                 print "starting query " + sqlcmd
                 print subprocess.call(sqlcmd,shell=True)
-        else:
-            pprint(self.blockfiles)
-            self.mkblockfields()
-            for region,filename in self.blockfiles.iteritems():
-                sqlcmd = self.generatesql(self.blockfields,"sqldb_block",filename,region)
-                print "starting query " + sqlcmd
-                print subprocess.call(sqlcmd,shell=True)
-
-        #[p.wait() for p in self.queries]
-        #except:
-            #[p.kill for p in self.svpipes.values()]
+        
+        pprint(self.blockfiles)
+        self.mkblockfields()
+        for region,filename in self.blockfiles.iteritems():
+            sqlcmd = self.generatesql(self.blockfields,Block._meta.db_table,filename,region)
+            print "starting query " + sqlcmd
+            print subprocess.call(sqlcmd,shell=True)
+        # set last txn_id properly
+      
+        LastTxn.objects.all().delete()
+        LastTxn(LAST_TXN_ID=self.txnid).save()
+    
 
     def generatesql(self,fields,table,filename,regionid):
         fieldstext = ",".join(fields)

@@ -11,8 +11,8 @@ class Tn(models.Model):
     LNPType=models.CharField(max_length=25)
     ActivationTS = models.DateField()
     #ActivationTimestamp = models.DateTimeField(db_column="ActivationTS")
-    TxnId = models.BigIntegerField(db_column="TXN_ID",default=195114) # set default to TX id of BDD dumps
-    RegionId = models.CharField(max_length=3,default="ma")
+    TxnId = models.BigIntegerField(db_column="TXN_ID") # set default to TX id of BDD dumps
+    RegionId = models.CharField(max_length=3)
     class Meta:
         db_table = 'SUBSCRIPTIONVERSION'
     
@@ -22,14 +22,18 @@ class Block(models.Model):
     LRN = models.BigIntegerField()
     SVType = models.IntegerField()
     SPID=models.CharField(max_length=25)
-    LNPType=models.CharField(max_length=25)
+    #LNPType=models.CharField(max_length=25)
     ActivationTS = models.DateField()
     #ActivationTimestamp = models.DateTimeField(db_column="ActivationTS")
-    TxnId = models.BigIntegerField(db_column="TXN_ID",default=195114) # set default to TX id of BDD dumps
-    RegionId = models.CharField(max_length=3,default="ma")
+    TxnId = models.BigIntegerField(db_column="TXN_ID") # set default to TX id of BDD dumps
+    RegionId = models.CharField(max_length=3)
+    class Meta:
+        db_table = 'NUMBERPOOLBLOCK'
 class LastTxn(models.Model):
-    LAST_TXN_ID = models.BigIntegerField()
+    LAST_TXN_ID = models.BigIntegerField(primary_key=True)
     TXN_TIMESTAMP = models.DateField(auto_now_add=True)
+    class Meta:
+        db_table = 'LAST_TXN'
     
 
 admin.site.register(LastTxn)
