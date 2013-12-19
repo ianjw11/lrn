@@ -17,8 +17,8 @@ class Tn(models.Model):
     SVType = models.PositiveSmallIntegerField(default=0)
     SPID=FixedCharField(max_length=5)
     LNPType=FixedCharField(max_length=5)
-    ActivationTS = models.DateField()
-    #ActivationTimestamp = models.DateTimeField(db_column="ActivationTS")
+    #ActivationTS = models.DateField()
+    ActivationTimestamp = models.DateTimeField(db_column="ActivationTS")
     TxnId = models.BigIntegerField(db_column="TXN_ID") # set default to TX id of BDD dumps
     RegionId = FixedCharField(max_length=2)
     class Meta:

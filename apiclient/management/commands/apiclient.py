@@ -34,7 +34,7 @@ class Wsdl(object):
     
     Context="test"
     maxrecords=20000
-    fields = ["LRN","SVType","SPID","LNPType","ActivationTS"]
+    fields = ["LRN","SVType","SPID","LNPType","ActivationTimestamp"]
     blockfields = ["LRN","SVType","SPID","ActivationTimestamp"]
  
     def __init__(self,**kwargs):

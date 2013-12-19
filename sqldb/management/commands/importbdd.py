@@ -17,7 +17,7 @@ class Command(BaseCommand):
     regions = ["ma","mw","ne","se","sw","wc","we"]
     path = "/opt/lrn/"
     db = db.settings.DATABASES['default']['NAME']
-    SvFields = ["ID-ignore","TN","LRN","SPID","ActivationTS","CLASS_DPC","CLASS_SSN","LIDB_DPC",
+    SvFields = ["ID-ignore","TN","LRN","SPID","ActivationTimestamp","CLASS_DPC","CLASS_SSN","LIDB_DPC",
          "LIDB_SSN","ISVM_DPC","ISVM_SSN","CNAM_DPC","CNAM_SSN","EndUserLocation",
          "EndUserLocationType","BillingId","LNPType","DownloadReason","WSMSC_DPC",
          "WSMSC_SSN","SVType","ALTSPID","VOICEURI","MMSURI","POCURI"," PRESURI",
