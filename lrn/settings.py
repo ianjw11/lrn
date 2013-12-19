@@ -1,4 +1,4 @@
-import lrn.mongo # sets up mongoengine connection and imports for db
+#import lrn.mongo # sets up mongoengine connection and imports for db
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG

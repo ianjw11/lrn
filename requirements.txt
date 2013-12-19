@@ -5,6 +5,7 @@ django==1.5
 django-celery
 celery[redis]
 south
+suds-jurko
 mongoengine
 MySQL-python
 txredisapi

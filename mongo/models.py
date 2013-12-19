@@ -1,7 +1,7 @@
 from mongoengine import *
 from mongoengine import fields
 
-connect("LNP_new",host="localhost")
+
 
 class Tn(Document):
     TN = fields.IntField(primary_key=True)

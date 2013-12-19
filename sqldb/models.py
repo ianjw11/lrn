@@ -1,8 +1,5 @@
-from mongoengine import *
+from django.contrib import admin
 from django.db import models
-
-
-connect("LNP_new",host="localhost")
 
 
 class Tn(models.Model):
@@ -34,7 +31,7 @@ class LastTxn(models.Model):
     LAST_TXN_ID = models.BigIntegerField()
     TXN_TIMESTAMP = models.DateField(auto_now_add=True)
     
-    
-from django.contrib import admin
+
 admin.site.register(LastTxn)
 admin.site.register(Tn)
+admin.site.register(Block)
