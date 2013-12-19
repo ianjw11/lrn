@@ -1,4 +1,3 @@
-#from bdd.helpers import *
 from sqldb.models import Tn,Block,LastTxn
 import csv
 from django.core.management.base import BaseCommand, CommandError
@@ -11,7 +10,7 @@ import os
 from multiprocessing import Process
 from optparse import make_option
 from pprint import pprint
-
+from os import listdir
 class Command(BaseCommand):
     regions = ["ma","mw","ne","se","sw","wc","we"]
     path = "/opt/lrn/"
@@ -32,7 +31,7 @@ class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option(
             "-t", 
-            "--tnx_id", 
+            "--txnid", 
             dest = "txnid",
             help = "specify last transactionid", 
             metavar = "TXN_ID"
@@ -57,7 +56,8 @@ class Command(BaseCommand):
         #check and parse all options first
         if options['txnid'] == None :
                 raise CommandError("Option '--txn=...' is required.") # exit if no txn_id specified....we need this
-        self.txnid = options['txn_id']
+        else:
+            self.txnid = options['txnid']
         
         if options['db'] == None:
             print """ no database specified, using {default}
