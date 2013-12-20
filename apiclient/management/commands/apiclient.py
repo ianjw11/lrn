@@ -36,7 +36,6 @@ class Wsdl(object):
     maxrecords=20000
     fields = ["LRN","SVType","SPID","LNPType","ActivationTimestamp"]
     blockfields = ["LRN","SVType","SPID","ActivationTimestamp"]
- 
     def __init__(self,**kwargs):
         self.results=[]
         self.client = Client(self.url+"?wsdl",location=self.url)
@@ -44,6 +43,7 @@ class Wsdl(object):
             setattr(self, k, v) # set obj attributes to kwargs
         try:
             self.LAST_TXN = LastTxn.objects.all().aggregate(Max('LAST_TXN_ID'))['LAST_TXN_ID__max']
+            print "Last sucessful transaction id was " + self.LAST_TXN
         except:
             print "error unable to get last transaction ID"
             raise Exception('TXN_ID')
