@@ -1,6 +1,7 @@
 from suds.client import Client
 import logging
-from apiclient.client import ApiClient
+import time
+from apiclient.api import ApiClient
 from sqldb.models import Tn,Block,LastTxn
 from django.db import transaction
 from django.db.models import Max
@@ -27,5 +28,9 @@ class Command(BaseCommand):
             self.batchsize=options['batchsize']
         api = ApiClient()
         api.maxrecords = self.batchsize
-        api.send()
+        while True:
+            api.send()
+            print "sleeping for 200 seconds"
+            time.sleep(200)
+            
 
