@@ -18,7 +18,7 @@ class TinyIntField(models.Field):
 class Tn(models.Model):
     ID = models.AutoField(primary_key=True)
     TN = models.BigIntegerField(unique=True,db_index=True)
-    LRN = models.BigIntegerField()
+    LRN = models.BigIntegerField(null=True)
     SVType = TinyIntField()
     SPID=FixedCharField(max_length=4)
     LNPType=FixedCharField(max_length=5)
@@ -31,7 +31,7 @@ class Tn(models.Model):
 class Block(models.Model):
     ID = models.AutoField(primary_key=True)
     NPANXXX = models.BigIntegerField(db_index=True,unique=True)#,db_column="NPA_NXX_X")
-    LRN = models.BigIntegerField()
+    LRN = models.BigIntegerField(null=True)
     #SVType = models.PositiveSmallIntegerField(default=0,null=True)
     SVType = TinyIntField()
     SPID= FixedCharField(max_length=4)
