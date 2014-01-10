@@ -8,7 +8,8 @@ from pprint import pprint
 from os import listdir
 from pprint import pprint
 class ApiClient(object):
-    url = "https://156.154.17.82/sipix_si_lnp/services/LNPDownload"
+    #url = "https://156.154.17.82/sipix_si_lnp/services/LNPDownload"
+    url = "https://156.154.19.197:9091/sipix_si_lnp/services/LNPDownload"
     #LAST_TXN=195114 # defaults for testing
     
     Context="test"
@@ -17,7 +18,9 @@ class ApiClient(object):
     blockfields = ["LRN","SVType","SPID","ActivationTimestamp"]
     def __init__(self,**kwargs):
         self.results=[]
+        print "connecting to url"
         self.client = Client(self.url+"?wsdl",location=self.url)
+        
         for k, v in kwargs.iteritems():  
             setattr(self, k, v) # set obj attributes to kwargs
         try:

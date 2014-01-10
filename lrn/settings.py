@@ -26,6 +26,9 @@ DATABASES = {
     },
 
 }
+DATABASE_OPTIONS = {
+    "connect_timeout": 6000,
+}
 """
 
 DATABASES = {

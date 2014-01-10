@@ -28,33 +28,35 @@ class Command(BaseCommand):
         count=Tn.objects.count()
         procs = []
         threads=4
+        batches = 20
         
-        chunksize = int(math.ceil(count) / float(threads))
-        for i in range(threads):
-            min = chunksize * i
-            max = chunksize * (i + 1)
-            #qs = Tn.objects.filter(pk__gt=min,pk__lte=max).only("TN","LRN")
-            #p = multiprocessing.Process(target=self.proc,args=(qs,min,i))
-            p = multiprocessing.Process(target=self.proc,args=(min,max,i))
-            procs.append(p)
-            p.start()
-        for p in procs:
-            p.join()
+        for e in range(batches):
+            chunksize = int(math.ceil(count) / float(threads) / float(batches))
+            for i in range(threads):
+                min = chunksize * i
+                max = chunksize * (i + 1)
+                #qs = Tn.objects.filter(pk__gt=min,pk__lte=max).only("TN","LRN")
+                #p = multiprocessing.Process(target=self.proc,args=(qs,min,i))
+                p = multiprocessing.Process(target=self.proc,args=(min,max,i))
+                procs.append(p)
+                p.start()
+            for p in procs:
+                p.join()
             
     #def proc(self,qs,minpk,i):
     def proc(self,min,max,i):
         print(" \n thread # " + str(i) + " with min pk " + str(min))
         r = redis.Redis("localhost")
-        qs = Tn.objects.filter(pk__gt=min,pk__lte=max).only("TN","LRN").order_by('pk')
+        qs = Tn.objects.filter(pk__gte=min,pk__lte=max).only("TN","LRN").order_by('pk')
         #QsIt(qs,min,r) # execute redis pipelines in chunks 
         pk = min
-        while pk < max:
-            p = r.pipeline(transaction=False)
-            for row in qs.filter(pk__gt=pk,pk__lte=max)[:50000]:
-                pk = row.pk
-                p.set(row.TN,row.LRN)
-                #yield row
-            p.execute()
+        #while pk < max:
+        p = r.pipeline(transaction=False)
+        for row in qs:#.filter(pk__gt=pk,pk__lte=max)[:50000]:
+            #pk = row.pk
+            p.set(row.TN,row.LRN)
+            #yield row
+        p.execute()
         
         
         

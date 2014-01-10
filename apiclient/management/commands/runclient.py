@@ -26,11 +26,18 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if options['batchsize'] !=None:
             self.batchsize=options['batchsize']
+        print "starting"
         api = ApiClient()
         api.maxrecords = self.batchsize
         while True:
-            api.send()
-            print "sleeping for 200 seconds"
-            time.sleep(200)
+            try:
+                print "starting loop"
+                api.send()
+                print "sleeping for 200 seconds"
+                time.sleep(200)
+            except Exception, err:
+                print "error" + str(err) + " occured, sleeping .... "
+                time.sleep(100)
+                continue
             
 
