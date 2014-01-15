@@ -13,9 +13,11 @@ from optparse import make_option
 from pprint import pprint
 from os import listdir
 import time
+from django.conf import settings
+
 class Command(BaseCommand):
     regions = ["ma","mw","ne","se","sw","wc","we"]
-    path = "/opt/lrn/"
+    path = settings.BDD_PATH # set default path from settings.py
     db = db.settings.DATABASES['default']['NAME']
     SvFields = ["ID-ignore","TN","LRN","SPID","ActivationTimestamp","CLASS_DPC","CLASS_SSN","LIDB_DPC",
          "LIDB_SSN","ISVM_DPC","ISVM_SSN","CNAM_DPC","CNAM_SSN","EndUserLocation",
@@ -54,10 +56,10 @@ class Command(BaseCommand):
         ),
         make_option(
             "-s", 
-            "--sv", 
-            dest = "sv",
+            "--nosv", 
+            dest = "nosv",
             action="store_true",
-            help = "specify if you want to load sv bdd files as well as block", 
+            help = "specify if you should NOT load up the sv files", 
             metavar = ""
         ),
     )
@@ -81,13 +83,10 @@ class Command(BaseCommand):
             print "no path specified using default of " + self.path
         else:
             self.path=options['path']
-        
         self.procs=[]
-        self.sv = False # flag to create handles for SV files if enabled SV files will have special pipes created so they can be read as GZ
-        #if "sv" in args:
-        #    sv = True
-        if options['sv'] != None:
-            self.sv = True
+        self.sv = True # flag to create handles for SV files if enabled SV files will have special pipes created so they can be read as GZ
+        if options['nosv'] != None:
+            self.sv = False
         self.generatepaths()
         self.run() 
     def startgz(self,svfile,region,pipefile):

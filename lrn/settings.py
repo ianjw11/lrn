@@ -1,6 +1,6 @@
 #import lrn.mongo # sets up mongoengine connection and imports for db
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -8,13 +8,20 @@ ADMINS = (
 )
 MANAGERS = ADMINS
 
+# Production = 156.154.17.36
+#API_URL = "https://156.154.17.36/sipix_si_lnp/services/LNPDownload"
 
+#dev url = 156.154.19.197:9091
+#API_URL="https://156.154.19.197:9091/sipix_si_lnp/services/LNPDownload"
+API_URL = "https://156.154.17.82/sipix_si_lnp/services/LNPDownload"
+#default bdd file path
+BDD_PATH = "/opt/lrn-old/"
 
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'LNP_prod',                      # Or path to database file if using sqlite3.
+        'NAME': 'LNP_dev',                      # Or path to database file if using sqlite3.
         'USER':'ian',
         'PASSWORD':'LNP-dev',
         'HOST':'localhost',

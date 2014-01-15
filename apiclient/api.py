@@ -7,11 +7,17 @@ from optparse import make_option
 from pprint import pprint
 from os import listdir
 from pprint import pprint
+from django.conf import settings
+
 class ApiClient(object):
     #url = "https://156.154.17.82/sipix_si_lnp/services/LNPDownload"
-    url = "https://156.154.19.197:9091/sipix_si_lnp/services/LNPDownload"
+    #url = "https://156.154.19.197:9091/sipix_si_lnp/services/LNPDownload"
     #LAST_TXN=195114 # defaults for testing
+    url=settings.API_URL # grab API url from settings.py
     
+    regions = {0:"mw",1:"ma",2:"ne",3:"se",4:"sw",5:"we",6:"wc",7:"ca"} # region mapping to ints
+    
+   
     Context="test"
     maxrecords=20000
     fields = ["LRN","SVType","SPID","LNPType","ActivationTimestamp"]
@@ -69,12 +75,18 @@ class ApiClient(object):
                     if 'CreateSV' in event:
                         dataelem=event.CreateSV # contains the fields we want
                         record = Tn(TN=dataelem.TN)
-           
                     elif 'UpdateSV' in event:
-                    
                         dataelem=event.UpdateSV
                         record,created = Tn.objects.get_or_create(TN=dataelem.TN)
+                        
                     record.TxnId=event.TransactionID # set record txnid to xml request txnid
+                    try:
+                        record.RegionId = self.regions[event.RegionID] # set record region to proper string repr
+                    except:
+                        print "region not found for region " + str(event.RegionID)
+                    if settings.DEBUG:
+                        print("\n regionid is "  + str(event.RegionID) + " with string " + record.RegionId )
+                        
                     for field in self.fields: # loop through fields
                         try:
                             value = getattr(dataelem,field) # get field from event xml obj
@@ -109,6 +121,13 @@ class ApiClient(object):
                         dataelem=event.UpdateBlock
                         record,created = Block.objects.get_or_create(NPANXXX=dataelem.NPANXXX)
                     record.TxnId=event.TransactionID # set record txnid to xml request txnid
+                    try:
+                        record.RegionId = self.regions[event.RegionID] # set record region to proper string repr
+                    except:
+                        print "region not found for region " + str(event.RegionID)
+                        
+                    if settings.DEBUG:
+                        print("\n regionid is "  + str(event.RegionID) + " with string " + record.RegionId )
                     for field in self.blockfields: # loop through fields
                         try:
                             value = getattr(dataelem,field) # get field from event xml obj
