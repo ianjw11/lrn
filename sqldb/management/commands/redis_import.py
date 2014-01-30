@@ -43,14 +43,18 @@ class Command(BaseCommand):
             self.doproc("sv")
             
     def doproc(self,table):
+        q = multiprocessing.Queue()
         for b in itertools.count():
             min = self.chunksize * b 
             max = self.chunksize * (b + 1)
-            p = multiprocessing.Process(target=self.proc,args=(min,max,table))
+            p = multiprocessing.Process(target=self.proc,args=(min,max,table,q))
             p.start()
             p.join()
+            if q.get()==0:
+                print "finished!"
+                break
            
-    def proc(self,min,max,table):
+    def proc(self,min,max,table,q):
         if table=="sv":
             obj = Tn
             field = "TN"
@@ -62,10 +66,12 @@ class Command(BaseCommand):
         print(" with min pk " + str(min))
         r = redis.Redis("localhost")
         qs = obj.objects.filter(pk__gte=min,pk__lte=max).only(field,"LRN").order_by('pk')
+        
         p = r.pipeline(transaction=False)
         for row in qs:
             p.set(getattr(row,field),row.LRN)
         p.execute()
+        q.put(len(qs))
         
    
         
