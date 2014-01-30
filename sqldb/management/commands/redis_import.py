@@ -49,7 +49,7 @@ class Command(BaseCommand):
             field = "TN"
         elif table=="block":
             obj = Block
-            field = "NPANXX"
+            field = "NPANXXX"
         else:
             raise("no table specified")
         print(" with min pk " + str(min))
