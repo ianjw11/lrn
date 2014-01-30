@@ -1,63 +1,65 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
-from sqldb.models import Tn
+from sqldb.models import Tn,Block
 import math
 import multiprocessing
 import redis
-
-
-
-def QsIt(queryset,pk,r,chunksize=100000):
-    print("\n at pk # " + str(pk))
-    p = r.pipeline(transaction=False)
-    last_pk = queryset.order_by('-pk')[0].pk
-    queryset = queryset.order_by('pk')
-    while pk < last_pk:
-        for row in queryset.filter(pk__gt=pk)[:chunksize]:
-            pk = row.pk
-            p.set(row.TN,row.LRN)
-            #yield row
-    p.execute()
-
-
+import itertools
+from optparse import make_option
 class Command(BaseCommand):
-    
+    option_list = BaseCommand.option_list + (
+        make_option(
+            "-s", 
+            "--sv", 
+            dest = "sv",
+            action="store_true",
+            help = "load sv table", 
+            metavar = ""
+        ),
+        make_option(
+            "-b", 
+            "--sv", 
+            dest = "block",
+            action="store_true",
+            help = "load block table", 
+            metavar = ""
+        ),
+                                             )
     def handle(self, *args, **options):
         args = ''
         help = 'import sql tns to redis'
-        count=Tn.objects.count()
-        
-        threads=4
-        batches = 200
-        for e in range(batches):
-            procs = []
-            chunksize = int(math.ceil(count) / float(threads) / float(batches))
-            for i in range(threads):
-                min = chunksize * i
-                max = chunksize * (i + 1)
-                #qs = Tn.objects.filter(pk__gt=min,pk__lte=max).only("TN","LRN")
-                #p = multiprocessing.Process(target=self.proc,args=(qs,min,i))
-                p = multiprocessing.Process(target=self.proc,args=(min,max,i))
-                procs.append(p)
-                p.start()
-            for p in procs:
-                p.join()
+        chunksize = 1000
+        if options['block']:
+            self.doproc("block")
+        elif options['sv']:
+            self.doproc("sv")
             
-    #def proc(self,qs,minpk,i):
-    def proc(self,min,max,i):
-        print(" \n thread # " + str(i) + " with min pk " + str(min))
+    def doproc(self,table):
+        for b in itertools.count():
+            min = self.chunksize * b 
+            max = self.chunksize * (b + 1)
+            p = multiprocessing.Process(target=self.proc,args=(min,max,table))
+            p.start()
+            p.join()
+           
+    def proc(self,min,max,table):
+        if table=="sv":
+            obj = Tn
+            field = "TN"
+        elif table=="block":
+            obj = Block
+            field = "NPANXX"
+        else:
+            raise("no table specified")
+        print(" with min pk " + str(min))
         r = redis.Redis("localhost")
-        qs = Tn.objects.filter(pk__gte=min,pk__lte=max).only("TN","LRN").order_by('pk')
-        #QsIt(qs,min,r) # execute redis pipelines in chunks 
-        pk = min
-        #while pk < max:
+        qs = obj.objects.filter(pk__gte=min,pk__lte=max).only(field,"LRN").order_by('pk')
         p = r.pipeline(transaction=False)
-        for row in qs:#.filter(pk__gt=pk,pk__lte=max)[:50000]:
-            #pk = row.pk
-            p.set(row.TN,row.LRN)
-            #yield row
+        for row in qs:
+            p.set(getattr(row,field),row.LRN)
         p.execute()
         
+   
         
         
         
