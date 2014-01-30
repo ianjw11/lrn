@@ -76,7 +76,7 @@ class Command(BaseCommand):
         r = redis.Redis("localhost")
         #qs = obj.objects.filter(pk__gte=min,pk__lte=max).only(field,"LRN").order_by('pk')
 
-        query = """SELECT {key},LRN FROM {table} WHERE ID between {min} AND {max};""".format({'key':field,'table':table,'min':min,'max':max})
+        query = """SELECT {field},LRN FROM {table} WHERE ID between {min} AND {max};""".format(field=field,table=table,min=min,max=max)
         cursor.execute(query)
         results = dictfetchall(cursor)
         q.put(len(results))
