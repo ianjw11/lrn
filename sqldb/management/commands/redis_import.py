@@ -75,8 +75,14 @@ class Command(BaseCommand):
         cursor = connection.cursor()
         r = redis.Redis("localhost")
         #qs = obj.objects.filter(pk__gte=min,pk__lte=max).only(field,"LRN").order_by('pk')
-        
-        cursor.execute("SELECT %(key)s,LRN FROM '%(table)s' WHERE ID between '%(min)s' AND '%(max)s';", {'key':field,'table':table,'min':min,'max':max})
+        cursor.execute('set profiling = 1')
+        try:
+            cursor.execute("SELECT %(key)s,LRN FROM '%(table)s' WHERE ID between '%(min)s' AND '%(max)s';", {'key':field,'table':table,'min':min,'max':max})
+        except Exception:
+            cursor.execute('show profiles')
+            for row in cursor:
+                print(row)        
+                cursor.execute('set profiling = 0') 
         results = dictfetchall(cursor)
         p = r.pipeline(transaction=False)
         for row in results:
