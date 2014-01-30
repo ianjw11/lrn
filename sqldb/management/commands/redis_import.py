@@ -24,12 +24,19 @@ class Command(BaseCommand):
             help = "load block table", 
             metavar = ""
         ),
+        make_option(
+            "-c", 
+            "--chunksize", 
+            dest = "chunksize",
+            help = "specify chunksize", 
+            metavar = "10000"
+        ),
                                              )
-    chunksize = 1000
+    chunksize = 200000
     def handle(self, *args, **options):
         args = ''
         help = 'import sql tns to redis'
-        
+        if options['chunksize']: self.chunksize=options['chunksize']
         if options['block']:
             self.doproc("block")
         elif options['sv']:
