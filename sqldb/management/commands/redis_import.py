@@ -26,10 +26,11 @@ class Command(BaseCommand):
         args = ''
         help = 'import sql tns to redis'
         count=Tn.objects.count()
-        procs = []
+        
         threads=4
         batches = 200
         for e in range(batches):
+            procs = []
             chunksize = int(math.ceil(count) / float(threads) / float(batches))
             for i in range(threads):
                 min = chunksize * i
