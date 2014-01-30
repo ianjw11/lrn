@@ -6,6 +6,14 @@ import multiprocessing
 import redis
 import itertools
 from optparse import make_option
+from django.db import connection
+def dictfetchall(cursor):
+    "Returns all rows from a cursor as a dict"
+    desc = cursor.description
+    return [
+        dict(zip([col[0] for col in desc], row))
+        for row in cursor.fetchall()
+    ]
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option(
@@ -38,9 +46,9 @@ class Command(BaseCommand):
         help = 'import sql tns to redis'
         if options['chunksize']: self.chunksize=options['chunksize']
         if options['block']:
-            self.doproc("block")
+            self.doproc("NUMBERPOOLBLOCK")
         elif options['sv']:
-            self.doproc("sv")
+            self.doproc("SUBSCRIPTIONVERSION")
             
     def doproc(self,table):
         q = multiprocessing.Queue()
@@ -55,23 +63,27 @@ class Command(BaseCommand):
                 break
            
     def proc(self,min,max,table,q):
-        if table=="sv":
+        if table=="SUBSCRIPTIONVERSION":
             obj = Tn
             field = "TN"
-        elif table=="block":
+        elif table=="NUMBERPOOLBLOCK":
             obj = Block
             field = "NPANXXX"
         else:
             raise("no table specified")
         print(" with min pk " + str(min))
+        cursor = connection.cursor()
         r = redis.Redis("localhost")
-        qs = obj.objects.filter(pk__gte=min,pk__lte=max).only(field,"LRN").order_by('pk')
+        #qs = obj.objects.filter(pk__gte=min,pk__lte=max).only(field,"LRN").order_by('pk')
         
+        cursor.execute("SELECT %(key)s,LRN FROM %(table)s WHERE ID between %(min)s AND %(max)s", {'key':field,'table':table,'min':min,'max':max})
+        results = dictfetchall(cursor)
         p = r.pipeline(transaction=False)
-        for row in qs:
-            p.set(getattr(row,field),row.LRN)
+        for row in results:
+            #p.set(getattr(row,field),row.LRN)
+            p.set(row[field],row['LRN'])
         p.execute()
-        q.put(len(qs))
+        q.put(len(results))
         
    
         
