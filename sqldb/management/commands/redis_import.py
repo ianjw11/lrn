@@ -56,7 +56,7 @@ class Command(BaseCommand):
             p.set(row.TN,row.LRN)
             #yield row
         p.execute()
-        del
+        
         
         
         
