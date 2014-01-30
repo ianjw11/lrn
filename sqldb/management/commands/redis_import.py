@@ -76,7 +76,7 @@ class Command(BaseCommand):
         r = redis.Redis("localhost")
         #qs = obj.objects.filter(pk__gte=min,pk__lte=max).only(field,"LRN").order_by('pk')
         
-        cursor.execute("SELECT %(key)s,LRN FROM %(table)s WHERE ID between %(min)s AND %(max)s", {'key':field,'table':table,'min':min,'max':max})
+        cursor.execute("SELECT %(key)s,LRN FROM '%(table)s' WHERE ID between '%(min)s' AND '%(max)s';", {'key':field,'table':table,'min':min,'max':max})
         results = dictfetchall(cursor)
         p = r.pipeline(transaction=False)
         for row in results:
