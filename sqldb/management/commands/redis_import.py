@@ -78,11 +78,14 @@ class Command(BaseCommand):
 
         query = """SELECT {field},LRN FROM {table} WHERE ID between {min} AND {max};""".format(field=field,table=table,min=min,max=max)
         cursor.execute(query)
-        results = dictfetchall(cursor)
-        q.put(len(results))
+        #results = dictfetchall(cursor)
+        
         p = r.pipeline(transaction=False)
+        results = cursor.fetchall()
+        q.put(len(results))
+        print "found " + str(len(results)) + " results"
         #for row in results:
-        for row in cursor.fetchall():
+        for row in results:
             #p.set(getattr(row,field),row.LRN)
             #p.set(row[field],row['LRN'])
             p.set(row[0],row[1])
