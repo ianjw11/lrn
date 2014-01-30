@@ -77,7 +77,8 @@ class Command(BaseCommand):
         #qs = obj.objects.filter(pk__gte=min,pk__lte=max).only(field,"LRN").order_by('pk')
         cursor.execute('set profiling = 1')
         try:
-            cursor.execute("SELECT %(key)s,LRN FROM '%(table)s' WHERE ID between '%(min)s' AND '%(max)s';", {'key':field,'table':table,'min':min,'max':max})
+            query = """SELECT {key},LRN FROM {table}s WHERE ID between {min}' AND {max};""".format({'key':field,'table':table,'min':min,'max':max})
+            cursor.execute(query)
         except Exception:
             cursor.execute('show profiles')
             for row in cursor:
