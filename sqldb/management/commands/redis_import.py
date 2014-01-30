@@ -81,9 +81,11 @@ class Command(BaseCommand):
         results = dictfetchall(cursor)
         q.put(len(results))
         p = r.pipeline(transaction=False)
-        for row in results:
+        #for row in results:
+        for row in cursor.fetchall():
             #p.set(getattr(row,field),row.LRN)
-            p.set(row[field],row['LRN'])
+            #p.set(row[field],row['LRN'])
+            p.set(row[0],row[1])
         p.execute()
         
         
