@@ -18,7 +18,7 @@ class Command(BaseCommand):
         ),
         make_option(
             "-b", 
-            "--sv", 
+            "--block", 
             dest = "block",
             action="store_true",
             help = "load block table", 
