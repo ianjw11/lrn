@@ -25,10 +25,11 @@ class Command(BaseCommand):
             metavar = ""
         ),
                                              )
+    chunksize = 1000
     def handle(self, *args, **options):
         args = ''
         help = 'import sql tns to redis'
-        chunksize = 1000
+        
         if options['block']:
             self.doproc("block")
         elif options['sv']:
